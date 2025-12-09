@@ -27,14 +27,18 @@ The goal of this framework is to showcase backend/API testing skills commonly re
 ## 🗂 Project Structure
 
 src/
-├── main/java/framework
-│ ├── auth/ → Authentication service
-│ ├── config/ → Environment configuration
-│ ├── http/ → ApiClient (GET/POST/PUT/DELETE)
-│ └── models/ → Booking and BookingDates POJOs
-└── test/java/tests
-├── login/ → Login test
-└── booking/ → Create, Update, Delete tests
+├── main
+│   └── java
+│       └── framework
+│           ├── auth/          → Authentication service
+│           ├── config/        → Environment configuration
+│           ├── http/          → ApiClient (GET/POST/PUT/DELETE)
+│           └── models/        → Booking and BookingDates POJOs
+└── test
+    └── java
+        └── tests
+            ├── login/         → Login test
+            └── booking/       → Create, Update, Delete tests
 
 ---
 
