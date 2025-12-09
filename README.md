@@ -26,6 +26,7 @@ The goal of this framework is to showcase backend/API testing skills commonly re
 
 ## 🗂 Project Structure
 
+```
 src/
 ├── main
 │   └── java
@@ -39,6 +40,7 @@ src/
         └── tests
             ├── login/         → Login test
             └── booking/       → Create, Update, Delete tests
+```
 
 ---
 
