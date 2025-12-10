@@ -28,21 +28,29 @@ public final class Environment {
     }
 
     public static String getBaseUrl() {
-        return getRequiredProperty("baseUrl");
+        return getRequiredProperty("baseUrl", "API_BASE_URL");
     }
 
     public static String getUsername() {
-        return getRequiredProperty("username");
+        return getRequiredProperty("username", "API_USERNAME");
     }
 
     public static String getPassword() {
-        return getRequiredProperty("password");
+        return getRequiredProperty("password", "API_PASSWORD");
     }
 
-    private static String getRequiredProperty(String key) {
+    private static String getRequiredProperty(String key, String envKey) {
+        // 1. Try environment variable
+        String envValue = System.getenv(envKey);
+        if (envValue != null && !envValue.isBlank()) {
+            return envValue;
+        }
+
+        // 2. Fallback to config.properties
         String value = PROPERTIES.getProperty(key);
         if (value == null || value.isBlank()) {
-            throw new IllegalStateException("Missing required property: " + key);
+            throw new IllegalStateException("Missing required configuration for: " + key
+                    + " (env var: " + envKey + ")");
         }
         return value;
     }
