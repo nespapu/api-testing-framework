@@ -66,6 +66,145 @@ The framework will:
 
 ---
 
+## 📐 Configuration & Environments
+
+The framework supports **multi-environment configuration**, allowing you to switch between different setups (e.g., local, CI, dev, prod) without modifying the source code.
+
+Configuration values come from three sources, in order of precedence:
+
+1. **Environment variables** (highest priority)
+2. **Environment-specific properties file** (`config-<env>.properties`)
+3. **Base properties file** (`config.properties`)
+
+---
+
+### 🔧 Base Configuration
+
+Common defaults are stored in:
+
+```
+src/main/resources/config.properties
+```
+
+Example:
+
+```
+baseUrl=https://restful-booker.herokuapp.com
+username=admin
+password=password123
+```
+
+---
+
+### 🌍 Environment Selection (API_ENV)
+
+The active environment is selected using:
+
+```
+API_ENV=<env>
+```
+
+If not provided, the framework defaults to:
+
+```
+API_ENV=local
+```
+
+For each environment, a corresponding file must exist:
+
+```
+src/main/resources/config-local.properties
+src/main/resources/config-ci.properties
+src/main/resources/config-dev.properties
+src/main/resources/config-prod.properties
+```
+
+Example config-ci.properties:
+
+```
+baseUrl=https://restful-booker.herokuapp.com
+```
+
+---
+
+### ⚙️ Overriding with Environment Variables
+
+Any configuration key can be overridden using environment variables:
+
+| Property key | Environment variable |
+| ------------ | -------------------- |
+| baseUrl      | `API_BASE_URL`       |
+| username     | `API_USERNAME`       |
+| password     | `API_PASSWORD`       |
+
+Env vars always take precedence over property files.
+
+Example (Linux / Git Bash):
+
+```
+export API_ENV=ci
+export API_BASE_URL=https://restful-booker.herokuapp.com
+export API_USERNAME=admin
+export API_PASSWORD=password123
+```
+
+Windows PowerShell equivalent:
+
+```
+$env:API_ENV="ci"
+$env:API_BASE_URL="https://restful-booker.herokuapp.com"
+```
+
+---
+
+### 🔎 Resolution Order
+
+When the framework needs a configuration value:
+
+1. Check if the corresponding environment variable exists
+2. If not, check config-<env>.properties
+3. If not, fall back to config.properties
+4. If missing in all sources → fail with a clear exception
+
+Example for the `baseUrl`:
+
+```
+API_BASE_URL  →  config-ci.properties  →  config.properties
+```
+
+---
+
+### 🧪 Verifying Environment Selection
+
+You can check which environment is currently active:
+
+```java
+Environment.getActiveEnvironment();
+```
+
+Useful for debugging or CI logging.
+
+---
+
+### 🚀 Example Usage
+
+Run tests using local configuration:
+
+```
+mvn clean test
+```
+
+Run tests using CI configuration with environment overrides:
+
+```
+export API_ENV=ci
+export API_USERNAME=ci-user
+export API_PASSWORD=ci-pass
+mvn clean test
+```
+
+---
+
 ## 🛠 Technologies Used
 
 - **Java 17**  
@@ -108,7 +247,6 @@ Deletes a booking and verifies that it no longer exists (`GET → 404`).
 - JSON Schema validation  
 - Parallel test execution  
 - Test data builder for bookings  
-- Config via `.properties` or `.env`
 
 ---
 
