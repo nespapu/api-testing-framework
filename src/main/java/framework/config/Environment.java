@@ -2,25 +2,22 @@ package framework.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Properties;
 
 public final class Environment {
 
+    private static final String DEFAULT_ENV = "local";
+    private static final String ENV_VAR_ENV = "API_ENV";
+
     private static final Properties PROPERTIES = new Properties();
+    private static final String ACTIVE_ENV = resolveActiveEnv();
 
     static {
-        try (InputStream input = Environment.class
-                .getClassLoader()
-                .getResourceAsStream("config.properties")) {
+        loadPropertiesFile("config.properties", false);
 
-            if (input == null) {
-                throw new IllegalStateException("config.properties file not found in classpath");
-            }
-
-            PROPERTIES.load(input);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to load config.properties", e);
-        }
+        String envSpecificFile = "config-" + ACTIVE_ENV + ".properties";
+        loadPropertiesFile(envSpecificFile, true);
     }
 
     private Environment() {
@@ -39,19 +36,50 @@ public final class Environment {
         return getRequiredProperty("password", "API_PASSWORD");
     }
 
+    public static String getActiveEnvironment() {
+        return ACTIVE_ENV;
+    }
+
+    private static String resolveActiveEnv() {
+        String envFromVar = System.getenv(ENV_VAR_ENV);
+        if (envFromVar != null && !envFromVar.isBlank()) {
+            return envFromVar.toLowerCase(Locale.ROOT);
+        }
+        return DEFAULT_ENV;
+    }
+
+    private static void loadPropertiesFile(String fileName, boolean failIfMissing) {
+        try (InputStream input = Environment.class
+                .getClassLoader()
+                .getResourceAsStream(fileName)) {
+
+            if (input == null) {
+                if (failIfMissing) {
+                    throw new IllegalStateException("Configuration file not found: " + fileName);
+                }
+                return;
+            }
+
+            PROPERTIES.load(input);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to load configuration file: " + fileName, e);
+        }
+    }
+
     private static String getRequiredProperty(String key, String envKey) {
-        // 1. Try environment variable
         String envValue = System.getenv(envKey);
         if (envValue != null && !envValue.isBlank()) {
             return envValue;
         }
 
-        // 2. Fallback to config.properties
         String value = PROPERTIES.getProperty(key);
         if (value == null || value.isBlank()) {
-            throw new IllegalStateException("Missing required configuration for: " + key
-                    + " (env var: " + envKey + ")");
+            throw new IllegalStateException(
+                    "Missing required configuration for key: " + key +
+                    " (env var: " + envKey + ", env: " + ACTIVE_ENV + ")"
+            );
         }
+
         return value;
     }
 }
