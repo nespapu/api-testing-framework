@@ -252,7 +252,9 @@ Deletes a booking and verifies that it no longer exists (`GET → 404`).
 
 ## 📄 License
 
-MIT License
+This project is open-source and distributed under the MIT License.  
+Copyright © 2025–present Néstor Pavón Puro.  
+For more information, see the [LICENSE](./LICENSE) file.
 
 ---
 
